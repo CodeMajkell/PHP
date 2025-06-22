@@ -1,0 +1,56 @@
+CREATE DATABASE IF NOT EXISTS blog CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE blog;
+
+-- Tabela użytkowników
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100),
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'author', 'user') DEFAULT 'user',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabela wpisów
+CREATE TABLE posts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    content TEXT NOT NULL,
+    image_path VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    author_id INT,
+    FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Tabela komentarzy
+CREATE TABLE comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    author_id INT,
+    guest_name VARCHAR(50),
+    content TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Tabela logów
+CREATE TABLE logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    action TEXT NOT NULL,
+    user_id INT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+
+
+
+-- Nadawanie roli
+UPDATE users SET role = 'author/user/admin' WHERE username = 'nazwaUżytkownika';
+
+-- Przykładowe konta z rolami (password: haslo123)
+INSERT INTO users (username, password, role) VALUES
+('admin',  '$2y$10$y8yxUzCyirrl8saksHTJ0.M.W41IGkVZ4rcNz8fM52.hqjVXtNen2', 'admin'),
+('autor',  '$2y$10$y8yxUzCyirrl8saksHTJ0.M.W41IGkVZ4rcNz8fM52.hqjVXtNen2', 'author'),
+('user1',  '$2y$10$y8yxUzCyirrl8saksHTJ0.M.W41IGkVZ4rcNz8fM52.hqjVXtNen2', 'user');
