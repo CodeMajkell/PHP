@@ -1,0 +1,1 @@
+Miejsce przechowywania obrazków
